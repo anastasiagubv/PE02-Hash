@@ -1,9 +1,9 @@
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 public class ProgramaPrincipal {
     Scanner sc = new Scanner(System.in);
-
-    String message = "";
 
     public static void main(String[] args) {
         ProgramaPrincipal s = new ProgramaPrincipal();
@@ -43,7 +43,7 @@ public class ProgramaPrincipal {
         boolean exit = false;
 
         do {
-            System.out.println("\n===== MENÚ =====");
+            System.out.println("\n--- MENÚ ---");
             System.out.println("1. Càlcul de resums");
             System.out.println("2. Verificar integritat d'un missatge");
             System.out.println("3. Registrar usuari");
@@ -57,7 +57,7 @@ public class ProgramaPrincipal {
                     hashMenu();
                     break;
                 case "2":
-                    verifyIntegrity();
+                    integrityMenu();
                     break;
                 case "3":
                     registerUser();
@@ -76,7 +76,7 @@ public class ProgramaPrincipal {
         } while (!exit);
     }
 
-    // Submenú
+    // Submenú part 1
     public void hashMenu() {
         boolean exit = false;
 
@@ -113,35 +113,137 @@ public class ProgramaPrincipal {
         } while (!exit);
     }
 
+    // Submenú part 2
+    public void integrityMenu() {
+        boolean exit = false;
+
+        do {
+            System.out.println("\n--- Verificar integritat ---");
+            System.out.println("1. Enviar missatge (emissor)");
+            System.out.println("2. Rebre missatge i verificar (receptor)");
+            System.out.println("0. Tornar");
+
+            String input = readString("Tria una opció: ");
+
+            switch (input.trim()) {
+                case "1":
+                    verifyIntegrity();
+                    break;
+                case "2":
+                    receiveMessage();
+                    break;
+                case "0":
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Opció no vàlida. Torna-ho a provar.");
+                    break;
+            }
+        } while (!exit);
+    }
+
     public void hashMessage() {
         String message = readString("\nIntrodueix un missatge: ");
-        String encrypted = ClasseHASH.calculateHash(message);
+        String hashMessage = ClasseHASH.calculateHash(message);
 
         System.out.println("Missatge introduït: " + message);
-        System.out.println("Missatge encriptat: " + encrypted);
+        System.out.println("Missatge en format Hash: " + hashMessage);
     }
 
     public void compareMessages() {
-        System.out.println("(pendent)");
+        String message1 = readString("\nIntrodueix el primer missatge: ");
+        String message2 = readString("Introdueix el segon missatge: ");
+
+        String hashMessage1 = ClasseHASH.calculateHash(message1);
+        String hashMessage2 = ClasseHASH.calculateHash(message2);
+
+        System.out.println("Missatge 1 introduït: " + message1);
+        System.out.println("Missatge 2 introduït: " + message2);
+
+        System.out.println("Missatge 1 en format Hash: " + hashMessage1);
+        System.out.println("Missatge 2 en format Hash: " + hashMessage2);
+
+        if (hashMessage1.equals(hashMessage2)) {
+            System.out.println("Els missatges Hash coincideixen");
+        } else {
+            System.out.println("Els missatges Hash no coincideixen");
+        }
     }
 
     public void modifyMessage() {
-        System.out.println("(pendent)");
+        String message = readString("\nIntrodueix un missatge: ");
+        String hashOriginal = ClasseHASH.calculateHash(message);
+
+        System.out.println("Missatge original: " + message);
+        System.out.println("Hash original:     " + hashOriginal);
+
+        // L'usuari modifica el missatge (encara que sigui una sola lletra)
+        String modifiedMessage = readString("\nModifica el missatge: ");
+        String hashModified = ClasseHASH.calculateHash(modifiedMessage);
+
+        System.out.println("\nMissatge original:  " + message);
+        System.out.println("Missatge modificat: " + modifiedMessage);
+        System.out.println("Hash original:  " + hashOriginal);
+        System.out.println("Hash modificat: " + hashModified);
+
+        if (hashOriginal.equals(hashModified)) {
+            System.out.println("El hash no ha canviat (el missatge és el mateix)");
+        } else {
+            System.out.println("El hash ha canviat completament");
+        }
     }
 
     public void repeatHash() {
-        System.out.println("(pendent)");
+        int times = 5;
+        String message = readString("\nIntrodueix un missatge: ");
+
+        // Calculem el primer hash per comparar-hi els altres
+        String firstHash = ClasseHASH.calculateHash(message);
+        boolean same = true;
+
+        System.out.println("Missatge: " + message);
+
+        for (int i = 1; i <= times; i++) {
+            String hashMessage = ClasseHASH.calculateHash(message);
+            System.out.println("Hash " + i + ": " + hashMessage);
+
+            if (!hashMessage.equals(firstHash)) {
+                same = false;
+            }
+        }
+
+        if (same) {
+            System.out.println("El hash es manté igual les " + times + " vegades");
+        } else {
+            System.out.println("El hash ha canviat en algun càlcul");
+        }
     }
 
     public void verifyIntegrity() {
-        System.out.println("(pendent)");
+        String message = readString("\nIntrodueix missatge: ");
+        String hashMessage = ClasseHASH.calculateHash(message);
+
+        try {
+            Files.writeString(Path.of("missatge.txt"), message);
+            Files.writeString(Path.of("missatgeHash.hash"), hashMessage);
+
+            System.out.println("Missatge enviat i guardat a missatge.txt");
+            System.out.println("Hash original guardat a missatge.hash: " + hashMessage);
+
+        } catch (Exception e) {
+            System.out.println("Error en guardar en fitxer: " + e);
+        }
+    }
+
+    public void receiveMessage() {
+
     }
 
     public void registerUser() {
-        System.out.println("(pendent)");
+        
     }
 
     public void login() {
-        System.out.println("(pendent)");
+        
     }
 }

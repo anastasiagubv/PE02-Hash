@@ -142,6 +142,7 @@ public class ProgramaPrincipal {
         } while (!exit);
     }
 
+    // PART 1
     public void hashMessage() {
         String message = readString("\nIntrodueix un missatge: ");
         String hashMessage = ClasseHASH.calculateHash(message);
@@ -219,16 +220,22 @@ public class ProgramaPrincipal {
         }
     }
 
+    // PART 2
     public void verifyIntegrity() {
         String message = readString("\nIntrodueix missatge: ");
         String hashMessage = ClasseHASH.calculateHash(message);
 
+        // Simulem que algú modifica el missatge pel camí (afegint un caràcter)
+        String modifiedMessage = message + "!";
+
         try {
             Files.writeString(Path.of("missatge.txt"), message);
-            Files.writeString(Path.of("missatgeHash.hash"), hashMessage);
+            Files.writeString(Path.of("missatge.hash"), hashMessage);
+            Files.writeString(Path.of("missatgeCanviat.txt"), modifiedMessage);
 
             System.out.println("Missatge enviat i guardat a missatge.txt");
             System.out.println("Hash original guardat a missatge.hash: " + hashMessage);
+            System.out.println("Versió modificada guardada a missatgeCanviat.txt: " + modifiedMessage);
 
         } catch (Exception e) {
             System.out.println("Error en guardar en fitxer: " + e);
@@ -236,7 +243,27 @@ public class ProgramaPrincipal {
     }
 
     public void receiveMessage() {
+        System.out.println("--- Recepció del missatge ---");
+        String fileName = readString("Introdueix el nom de l'arxiu (Ex: missatge.txt): ");
 
+        try {
+            String receivedMessage = Files.readString(Path.of(fileName));
+
+            String hashFile = ClasseHASH.calculateHash(receivedMessage);
+
+            String originalHash = Files.readString(Path.of("missatge.hash")).trim();
+
+            System.out.println("Hash del missatge rebut: " + hashFile);
+            System.out.println("Hash del missatge original: " + originalHash);
+
+            if (hashFile.equals(originalHash)) {
+                System.out.println("Els hashes del missatge coincideixen");
+            } else {
+                System.out.println("S'ha detectat una modificació");
+            }
+        } catch (Exception e) {
+            System.out.println("Error: no s'ha trobat el fitxer" + "\n" + e);
+        }
     }
 
     public void registerUser() {

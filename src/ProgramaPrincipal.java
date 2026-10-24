@@ -50,6 +50,7 @@ public class ProgramaPrincipal {
             System.out.println("2. Verificar integritat d'un missatge");
             System.out.println("3. Registrar usuari");
             System.out.println("4. Iniciar sessió");
+            System.out.println("5. Prova: login amb una salt diferent");
             System.out.println("0. Sortir");
 
             String input = readString("Tria una opció: ");
@@ -66,6 +67,9 @@ public class ProgramaPrincipal {
                     break;
                 case "4":
                     login();
+                    break;
+                case "5":
+                    loginWrongSalt();
                     break;
                 case "0":
                     System.out.println("Sortint del programa");
@@ -306,7 +310,7 @@ public class ProgramaPrincipal {
             System.out.println("Error: l'usuari no està registrat");
             return;
         }
-        
+
         String password = readString("Introdueix la teva contrasenya: ");
 
         for (int i = 0; i < users.size(); i++) {
@@ -324,6 +328,42 @@ public class ProgramaPrincipal {
                 }
             }
         }
+    }
+
+    public void loginWrongSalt() {
+       System.out.println("--- Prova: login amb una salt diferent ---");
+
+        String userName = readString("\nIntrodueix el teu nom d'usuari: ");
+
+        // En cas de que no existeixi l'usuari
+        if (!existsUser(userName)) {
+            System.out.println("Error: l'usuari no està registrat");
+            return;
+        }
+
+        String password = readString("Introdueix la teva contrasenya: ");
+
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getUserName().equals(userName)) {
+
+                String hash = users.get(i).getHash();
+                String salt = users.get(i).getSalt();
+
+                String wrongSalt = ClasseHASH.generateSalt();
+                String newHash = ClasseHASH.calculateHash(password + wrongSalt);
+
+                System.out.println("\nSalt guardat: " + salt);
+                System.out.println("Salt diferent: " + wrongSalt);
+                System.out.println("Hash guardat: " + hash);
+                System.out.println("Hash calculat: " + newHash);
+
+                if (hash.equals(newHash)) {
+                    System.out.println("Accés permès. Benvingut/da, " + userName);
+                } else {
+                    System.out.println("Accés denegat: amb una salt diferent el hash no coincideix");
+                }
+            }
+        } 
     }
 
     public boolean existsUser(String userName) {

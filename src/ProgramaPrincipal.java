@@ -257,6 +257,7 @@ public class ProgramaPrincipal {
 
             String hashFile = ClasseHASH.calculateHash(receivedMessage);
 
+            // trim() treu possibles salts de línia perquè l'equals no falli
             String originalHash = Files.readString(Path.of("missatge.hash")).trim();
 
             System.out.println("Hash del missatge rebut: " + hashFile);
@@ -288,9 +289,11 @@ public class ProgramaPrincipal {
 
         String password = readString("Introdueix la contrasenya: ");
 
+        // Salt aleatòria per a cada usuari: la mateixa contrasenya dona hashes diferents
         String salt = ClasseHASH.generateSalt();
         String hash = ClasseHASH.calculateHash(password + salt);
 
+        // Només es guarden el nom, la salt i el hash (mai la contrasenya)
         Usuari user = new Usuari(userName, salt, hash);
         users.add(user);
 
@@ -319,6 +322,7 @@ public class ProgramaPrincipal {
                 String hash = users.get(i).getHash();
                 String salt = users.get(i).getSalt();
 
+                // Amb la salt guardada, si la contrasenya és correcta surt el mateix hash
                 String newHash = ClasseHASH.calculateHash(password + salt);
 
                 if (hash.equals(newHash)) {
@@ -349,6 +353,7 @@ public class ProgramaPrincipal {
                 String hash = users.get(i).getHash();
                 String salt = users.get(i).getSalt();
 
+                // Fem servir una salt nova en lloc de la guardada per veure què passa
                 String wrongSalt = ClasseHASH.generateSalt();
                 String newHash = ClasseHASH.calculateHash(password + wrongSalt);
 
@@ -366,6 +371,7 @@ public class ProgramaPrincipal {
         } 
     }
 
+    // Recorre la llista i retorna true si troba un usuari amb aquest nom
     public boolean existsUser(String userName) {
         boolean exists = false;
 

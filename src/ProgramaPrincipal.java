@@ -1,9 +1,11 @@
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ProgramaPrincipal {
     Scanner sc = new Scanner(System.in);
+    ArrayList<Usuari> users = new ArrayList<>();
 
     public static void main(String[] args) {
         ProgramaPrincipal s = new ProgramaPrincipal();
@@ -238,7 +240,7 @@ public class ProgramaPrincipal {
             System.out.println("Versió modificada guardada a missatgeCanviat.txt: " + modifiedMessage);
 
         } catch (Exception e) {
-            System.out.println("Error en guardar en fitxer: " + e);
+            System.out.println("Error en guardar en fitxer: " + e.getMessage());
         }
     }
 
@@ -262,15 +264,77 @@ public class ProgramaPrincipal {
                 System.out.println("S'ha detectat una modificació");
             }
         } catch (Exception e) {
-            System.out.println("Error: no s'ha trobat el fitxer" + "\n" + e);
+            System.out.println("Error: no s'ha trobat el fitxer" + "\n" + e.getMessage());
         }
     }
 
+    // PART 3
     public void registerUser() {
-        
+        System.out.println("--- Registre d'usuari ---");
+
+        String userName = "";
+        do {
+            userName = readString("\nIntrodueix el nom d'usuari: ");
+
+            if (existsUser(userName)) {
+                System.out.println("Error: aquest usuari ja existeix");
+            }
+
+        } while (existsUser(userName));
+
+        String password = readString("Introdueix la contrasenya: ");
+
+        String salt = ClasseHASH.generateSalt();
+        String hash = ClasseHASH.calculateHash(password + salt);
+
+        Usuari user = new Usuari(userName, salt, hash);
+        users.add(user);
+
+        System.out.println("Usuari guardat correctament!");
+        System.out.println("Usuari: " + userName);
+        System.out.println("Salt: " + salt);
+        System.out.println("Hash: " + hash);
     }
 
     public void login() {
+        System.out.println("--- Iniciar Sessió ---");
+
+        String userName = readString("\nIntrodueix el teu nom d'usuari: ");
+
+        // En cas de que no existeixi l'usuari
+        if (!existsUser(userName)) {
+            System.out.println("Error: l'usuari no està registrat");
+            return;
+        }
         
+        String password = readString("Introdueix la teva contrasenya: ");
+
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getUserName().equals(userName)) {
+
+                String hash = users.get(i).getHash();
+                String salt = users.get(i).getSalt();
+
+                String newHash = ClasseHASH.calculateHash(password + salt);
+
+                if (hash.equals(newHash)) {
+                    System.out.println("Accés permès. Benvingut/da, " + userName);
+                } else {
+                    System.out.println("Error: contrasenya incorrecta");
+                }
+            }
+        }
+    }
+
+    public boolean existsUser(String userName) {
+        boolean exists = false;
+
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getUserName().equals(userName)) {
+                exists = true;
+            }
+        }
+
+        return exists;
     }
 }
